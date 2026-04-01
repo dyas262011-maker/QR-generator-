@@ -1,0 +1,78 @@
+<!DOCTYPE html><html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Plant QR Premium</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<style>
+body{
+ margin:0;
+ font-family:sans-serif;
+ background:linear-gradient(180deg,#1a002a,#0b0015);
+ color:#fff;
+}
+.container{padding:20px}
+.card{
+ background:linear-gradient(145deg,#2b0045,#4b007d);
+ padding:20px;
+ border-radius:15px;
+ margin:15px 0;
+ box-shadow:0 0 25px #a100ff55;
+ animation:fade .6s;
+}
+button{
+ width:100%;
+ padding:12px;
+ border:none;
+ border-radius:10px;
+ background:linear-gradient(90deg,#7b00ff,#c800ff);
+ color:#fff;
+ margin-top:10px;
+}
+img{width:100%;border-radius:10px}
+@keyframes fade{from{opacity:0;transform:translateY(20px)}to{opacity:1}}
+</style>
+</head>
+<body>
+<div class="container" id="app"></div><script>
+let plants = JSON.parse(localStorage.getItem("plants")||"[]");
+function save(){localStorage.setItem("plants",JSON.stringify(plants));}
+
+function home(){
+ app.innerHTML=`
+ <div class="card">
+ <h2>Tambah Tumbuhan</h2>
+ <input id="nama" placeholder="Nama" style="width:100%;padding:10px;margin:5px 0">
+ <input id="img" placeholder="Link Gambar" style="width:100%;padding:10px;margin:5px 0">
+ <textarea id="desk" placeholder="Deskripsi" style="width:100%;padding:10px"></textarea><button onclick="add()">Tambah</button>
+
+ </div>${plants.map((p,i)=>`
+
+ <div class="card">
+ <h3>${p.nama}</h3>
+ <button onclick="showQR(${i})">Generate QR</button>
+ <button onclick="view(${i})">Lihat Detail</button>
+ </div>
+ `).join("")}
+ `;
+}function add(){ plants.push({nama:nama.value,img:img.value,desk:desk.value}); save();home(); }
+
+function showQR(i){ let url = location.href.split("?")[0]+"?id="+i; app.innerHTML=`
+
+ <div class="card">
+ <h2>QR Code</h2>
+ <canvas id="qr"></canvas>
+ </div>`;
+ QRCode.toCanvas(document.getElementById("qr"), url, { width: 300 });
+}function view(i){ let p = plants[i]; app.innerHTML=`
+
+ <div class="card">
+ <h2>${p.nama}</h2>
+ <img src="${p.img}">
+ <p>${p.desk}</p>
+ <button onclick="window.location.href='https://wa.me/628xxxx'">Whatsapp Admin</button>
+ <button onclick="window.location.href='https://t.me/username'">Telegram Admin</button>
+ </div>`;
+}let params = new URLSearchParams(location.search); if(params.get("id")){ view(params.get("id")); }else{ home(); } </script>
+
+</body>
+</html>
